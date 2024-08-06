@@ -14,6 +14,7 @@ function App() {
       .catch(error => console.error('Error fetching data:', error));
   }, []);
 
+
   const addBlog = () => {
     if (editId) {
       axios.put(`http://localhost:5000/blogs/${editId}`, { title, content })
@@ -31,6 +32,7 @@ function App() {
     }
   };
 
+  
   const editBlog = (id, blogTitle, blogContent) => {
     setEditId(id);
     setTitle(blogTitle);

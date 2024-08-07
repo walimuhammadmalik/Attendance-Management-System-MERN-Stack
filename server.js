@@ -31,3 +31,14 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+const User = require("./models/user");
+async function testUser() {
+  const user = await User.create({
+    name: "John Doe",
+    email: "wawa@g.com",
+    password: "123asass",
+    role: "admin",
+  });
+  console.log(user);
+}
+testUser();

@@ -1,12 +1,11 @@
-// server.js
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const app = express();
+// // server.js
+// const express = require("express");
+// const mongoose = require("mongoose");
+// const cors = require("cors");
+// const appa = express();
 
-app.use(express.json());
-app.use(cors());
-
+// appa.use(express.json());
+// appa.use(cors());
 
 // mongoose.connect("mongodb://localhost:27017/mernblog", {
 //   useNewUrlParser: true,
@@ -49,8 +48,7 @@ app.use(cors());
 // });
 //nnew code
 
-
-const app = require('./app');
+const app = require("./app");
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

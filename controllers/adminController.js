@@ -1,8 +1,8 @@
 // controllers/adminController.js
-const User = require('../models/User');
-const Attendance = require('../models/Attendance');
-const LeaveRequest = require('../models/LeaveRequest');
-const Grade = require('../models/Grade');
+const User = require('../models/user');
+const Attendance = require('../models/attendance');
+const LeaveRequest = require('../models/leaveRequest');
+const Grade = require('../models/grade');
 
 // Get all students
 const manageStudents = async (req, res) => {

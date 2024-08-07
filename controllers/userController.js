@@ -1,4 +1,3 @@
-// controllers/userController.js
 const User = require("../models/user");
 const Attendance = require("../models/attendance");
 const LeaveRequest = require("../models/leaveRequest");

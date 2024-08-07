@@ -1,54 +1,31 @@
-// // server.js
-// const express = require("express");
-// const mongoose = require("mongoose");
-// const cors = require("cors");
-// const appa = express();
+const express = require("express");
+const dotenv = require("dotenv");
+const connectDB = require("./config/db");
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
-// appa.use(express.json());
-// appa.use(cors());
+dotenv.config();
 
-// mongoose.connect("mongodb://localhost:27017/mernblog", {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-// });
+// Connect to the database
+connectDB();
 
-// const blogSchema = new mongoose.Schema({
-//   title: String,
-//   content: String,
-// });
+const app = express();
 
-// const Blog = mongoose.model("Blog", blogSchema);
+// Middleware to parse JSON bodies
+app.use(express.json());
 
-// app.post("/blogs", async (req, res) => {
-//   const newBlog = new Blog(req.body);
-//   console.log(req.body);
-//   await newBlog.save();
-//   res.json(newBlog);
-// });
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/admin", adminRoutes);
 
-// app.get("/blogs", async (req, res) => {
-//   const blogs = await Blog.find();
-//   res.json(blogs);
-// });
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "Server error" });
+});
 
-// app.put("/blogs/:id", async (req, res) => {
-//   const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
-//     new: true,
-//   });
-//   res.json(blog);
-// });
-
-// app.delete("/blogs/:id", async (req, res) => {
-//   await Blog.findByIdAndDelete(req.params.id);
-//   res.send("Blog deleted");
-// });
-
-// app.listen(5000, () => {
-//   console.log("Server is running on port 5000");
-// });
-//nnew code
-
-const app = require("./app");
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

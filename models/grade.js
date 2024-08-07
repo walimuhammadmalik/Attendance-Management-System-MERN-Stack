@@ -1,7 +1,7 @@
 //model/grade.js
 const mongoose = require('mongoose');
 
-const gradeSchema = new mongoose.Schema({
+const gradeSchema = mongoose.Schema({
   attendancePercentage: { type: Number, required: true },
   grade: { type: String, required: true },
 });

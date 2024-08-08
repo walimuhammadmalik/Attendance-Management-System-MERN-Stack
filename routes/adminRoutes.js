@@ -73,6 +73,7 @@ router.post(
   adminController.postAttendanceRecord
 );
 
+
 router.put(
   "/updateAttendanceRecordByEmail/:email",
   protect,

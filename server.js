@@ -4,21 +4,33 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-
+const bodyParser = require("body-parser");
+const cors = require("cors");
 dotenv.config();
+
+const app = express();
+// Parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Parse application/json
+app.use(bodyParser.json());
+var vorOptions = {
+  origin: "http://localhost:5000",
+  optionsSuccessStatus: 200,
+};
 
 // Connect to the database
 connectDB();
 
-const app = express();
-
 // Middleware to parse JSON bodies
 app.use(express.json());
 
+console.log("server.js");
+app.use(cors(vorOptions));
 // Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/admin", adminRoutes);
+app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
+app.use("/admin", adminRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -26,19 +38,23 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Server error" });
 });
 
+app.get("/example", (req, res) => {
+  res.send("Hello World!");
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-const User = require("./models/user");
-async function testUser() {
-  const user = await User.create({
-    name: "John Doe",
-    email: "wawa@g.com",
-    password: "123asass",
-    role: "admin",
-  });
-  console.log(user);
-}
-testUser();
+// const User = require("./models/user");
+// async function testUser() {
+//   const user = await User.create({
+//     name: "John Doe",
+//     email: "wawas@g.com",
+//     password: "123asass",
+//     role: "admin",
+//   });
+//   console.log(user);
+// }
+// testUser();

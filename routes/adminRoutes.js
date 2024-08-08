@@ -5,7 +5,7 @@ const {
   getLeaveRequests,
   manageGradingCriteria,
 } = require("../controllers/adminController");
-const protect = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
 
 const router = express.Router();

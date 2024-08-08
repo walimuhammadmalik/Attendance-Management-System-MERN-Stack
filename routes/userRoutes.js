@@ -5,7 +5,7 @@ const {
   markAttendance,
   requestLeave,
 } = require("../controllers/userController");
-const protect = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 

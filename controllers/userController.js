@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Attendance = require("../models/attendance");
 const LeaveRequest = require("../models/leaveRequest");
+const Grade = require("../models/grade");
 
 // Get user profile
 const getUserProfile = async (req, res) => {
@@ -17,16 +18,34 @@ const getUserProfile = async (req, res) => {
 
 // Update user profile
 const updateUserProfile = async (req, res) => {
-  const { name, email } = req.body;
+  const obj = req.body;
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    user.name = name || user.name;
-    user.email = email || user.email;
+    user.name = obj.name || user.name;
+    user.email = obj.email || user.email;
+    user.profilePic = req.file
+      ? req.file.path
+      : user.profilePic || obj.profilePic;
+    password = req.body.password || user.password;
     await user.save();
+    console.log("User updated :", user);
     res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+//delete user profile
+const deleteUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    await user.remove();
+    res.json({ message: "User removed" });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
@@ -58,6 +77,15 @@ const markAttendance = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+//attendance report
+const getAttendanceReport = async (req, res) => {
+  try {
+    const attendance = await Attendance.find({ userId: req.user._id });
+    res.json(attendance);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 // Request leave
 const requestLeave = async (req, res) => {
@@ -76,10 +104,33 @@ const requestLeave = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+// get leave request
+const getLeaveRequest = async (req, res) => {
+  try {
+    const leaveRequest = await LeaveRequest.find({ userId: req.user._id });
+
+    res.json(leaveRequest);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+// get grade
+const getGrade = async (req, res) => {
+  try {
+    const grade = await Grade.find();
+    res.json(grade);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 module.exports = {
   getUserProfile,
   updateUserProfile,
   markAttendance,
   requestLeave,
+  getAttendanceReport,
+  getLeaveRequest,
+  deleteUserProfile,
+  getGrade,
 };

@@ -1,40 +1,32 @@
 //model/user.js
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const userSchema = mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: {
+    type: String,
+    required: true,
+    set: (value) => {
+      return bcrypt.hashSync(value);
+    },
+  },
   role: {
     type: String,
     required: true,
     enum: ["admin", "student"],
     default: "student",
   },
-  attendance: [{ type: mongoose.Schema.Types.ObjectId, ref: "Attendance" }],
+  profilePic: { type: String },
 });
 
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;
 
-// const mongoose = require("mongoose");
-// const { Sequelize, DataTypes } = require("sequelize");
-// const sequelize = require("../config/db").sequelize;
-
-// const userSchema = new mongoose.Schema({
-//   name: { type: String, required: true },
-//   email: { type: String, required: true, unique: true },
-//   password: { type: String, required: true },
-//   role: { type: String, default: "user" },
-// });
-
-// const User = mongoose.model("User", userSchema);
-
-// const UserAttendance = sequelize.define("UserAttendance", {
-//   userId: { type: DataTypes.INTEGER, allowNull: false },
-//   date: { type: DataTypes.DATEONLY, allowNull: false },
-//   status: { type: DataTypes.STRING, allowNull: false },
-// });
-
-// module.exports = { User, UserAttendance };
+// grade: { type: mongoose.Schema.Types.ObjectId, ref: "Grade" },
+//   leaveRequests: [
+//     { type: mongoose.Schema.Types.ObjectId, ref: "LeaveRequest" },
+//   ],
+//   attendance: [{ type: mongoose.Schema.Types.ObjectId, ref: "Attendance" }],

@@ -1,28 +1,144 @@
 const express = require("express");
-const {
-  manageStudents,
-  getAttendanceRecords,
-  getLeaveRequests,
-  manageGradingCriteria,
-} = require("../controllers/adminController");
-const protect = require("../middleware/authMiddleware");
+const adminController = require("../controllers/adminController");
+const { protect } = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
 
 const router = express.Router();
 
-router.get("/students", protect, roleMiddleware("admin"), manageStudents);
+router.get(
+  "/students",
+  protect,
+  roleMiddleware("admin"),
+  adminController.manageStudents
+);
 router.get(
   "/attendance",
   protect,
   roleMiddleware("admin"),
-  getAttendanceRecords
+  adminController.getAttendanceRecords
 );
-router.get("/leaves", protect, roleMiddleware("admin"), getLeaveRequests);
+router.get(
+  "/leaves",
+  protect,
+  roleMiddleware("admin"),
+  adminController.getLeaveRequests
+);
 router.post(
   "/grading",
   protect,
   roleMiddleware("admin"),
-  manageGradingCriteria
+  adminController.manageGradingCriteria
+);
+router.get(
+  "/students/:email",
+  protect,
+  roleMiddleware("admin"),
+  adminController.getStudentByEmail
+);
+router.post(
+  "/students",
+  protect,
+  roleMiddleware("admin"),
+  adminController.postStudent
+);
+router.put(
+  "/students/:email",
+  protect,
+  roleMiddleware("admin"),
+  adminController.updateStudentByEmail
+);
+router.delete(
+  "/students/:email",
+  protect,
+  roleMiddleware("admin"),
+  adminController.deleteStudentByEmail
+);
+router.get(
+  "/getAttendanceRecord",
+  protect,
+  roleMiddleware("admin"),
+  adminController.getAttendanceRecord
+);
+
+router.get(
+  "/getAttendanceRecordByEmail/:email",
+  protect,
+  roleMiddleware("admin"),
+  adminController.getAttendanceRecordByEmail
+);
+router.post(
+  "/postAttendanceRecord/:email",
+  protect,
+  roleMiddleware("admin"),
+  adminController.postAttendanceRecord
+);
+
+
+router.put(
+  "/updateAttendanceRecordByEmail/:email",
+  protect,
+  roleMiddleware("admin"),
+  adminController.updateAttendanceRecordByEmail
+);
+router.delete(
+  "/deleteAttendanceRecordByEmail/:email",
+  protect,
+  roleMiddleware("admin"),
+  adminController.deleteAttendanceRecordByEmail
+);
+router.get(
+  "/getLeaveRequest",
+  protect,
+  roleMiddleware("admin"),
+  adminController.getLeaveRequest
+);
+router.put(
+  "/approveLeaveRequest",
+  protect,
+  roleMiddleware("admin"),
+  adminController.approveLeaveRequest
+);
+router.put(
+  "/rejectLeaveRequest",
+  protect,
+  roleMiddleware("admin"),
+  adminController.rejectLeaveRequest
+);
+router.get(
+  "/grading",
+  protect,
+  roleMiddleware("admin"),
+  adminController.getGradingCriteria
+);
+router.get(
+  "/getGradingCriteriaByEmail/:email",
+  protect,
+  roleMiddleware("admin"),
+  adminController.getGradingCriteriaByEmail
+);
+router.post(
+  "/postGradingCriteria",
+  protect,
+  roleMiddleware("admin"),
+  adminController.postGradingCriteria
+);
+router.put(
+  "/updateGradingCriteriaByEmail/:email",
+  protect,
+  roleMiddleware("admin"),
+  adminController.updateGradingCriteriaByEmail
+);
+router.put(
+  "/markGradingCriteriaByEmail/:email",
+  protect,
+  roleMiddleware("admin"),
+  adminController.markGradingCriteriaByEmail
+);
+router.delete(
+  "/deleteGradingCriteriaByEmail/:email",
+  protect,
+  roleMiddleware("admin"),
+  adminController.deleteGradingCriteriaByEmail
 );
 
 module.exports = router;

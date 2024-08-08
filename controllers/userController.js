@@ -19,6 +19,7 @@ const getUserProfile = async (req, res) => {
 // Update user profile
 const updateUserProfile = async (req, res) => {
   const obj = req.body;
+  console.log("update user profile: ", req.body);
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
@@ -39,21 +40,26 @@ const updateUserProfile = async (req, res) => {
 };
 //delete user profile
 const deleteUserProfile = async (req, res) => {
+  console.log("delete user profile: ", req.user);
+  // console.log("User found :", user);
   try {
-    const user = await User.findById(req.user._id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (!req.user) {
+      return res.status(401).json({ message: "User not found" });
     }
-    await user.remove();
+    const user = await User.findById(req.user._id);
+    await user.deleteOne();
     res.json({ message: "User removed" });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.log("delete error: ", error);
+    res.status(500).json({ message: "delete Server error" });
   }
 };
 
 // Mark attendance
 const markAttendance = async (req, res) => {
-  const { date } = req.body;
+  console.log("mark attendance: ", req.user);
+  const date = new Date().toLocaleDateString();
+  console.log("date: ", date);
   try {
     // Check if attendance already marked for today
     const existingAttendance = await Attendance.findOne({
@@ -69,16 +75,20 @@ const markAttendance = async (req, res) => {
     const attendance = new Attendance({
       userId: req.user._id,
       date,
+      status: "present",
     });
 
     const markedAttendance = await attendance.save();
     res.status(201).json(markedAttendance);
   } catch (error) {
+    console.log("mark attendance error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 //attendance report
 const getAttendanceReport = async (req, res) => {
+  console.log("get attendance report: ", req.user);
+  // console.log("date: ", Date());
   try {
     const attendance = await Attendance.find({ userId: req.user._id });
     res.json(attendance);
@@ -90,6 +100,8 @@ const getAttendanceReport = async (req, res) => {
 // Request leave
 const requestLeave = async (req, res) => {
   const { startDate, endDate, reason } = req.body;
+  console.log("request leave: ", req.body);
+  console.log("request leave: ", req.user);
   try {
     const leaveRequest = new LeaveRequest({
       userId: req.user._id,
@@ -101,6 +113,7 @@ const requestLeave = async (req, res) => {
     const request = await leaveRequest.save();
     res.status(201).json(request);
   } catch (error) {
+    console.log("request leave error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -116,10 +129,29 @@ const getLeaveRequest = async (req, res) => {
 };
 // get grade
 const getGrade = async (req, res) => {
+  console.log("get grade: ", req.user);
   try {
-    const grade = await Grade.find();
+    const grade = await Grade.find({ userId: req.user._id });
     res.json(grade);
   } catch (error) {
+    console.log("get grade error: ", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+// test grade
+const testGrade = async (req, res) => {
+  console.log("test grade: ", req.user);
+  const { attendancePercentage, grade } = req.body;
+  try {
+    const grades = new Grade({
+      userId: req.user._id,
+      attendancePercentage: attendancePercentage,
+      grade: grade,
+    });
+    const newGrade = await grades.save();
+    res.json(newGrade);
+  } catch (error) {
+    console.log("test grade error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -133,4 +165,5 @@ module.exports = {
   getLeaveRequest,
   deleteUserProfile,
   getGrade,
+  testGrade,
 };

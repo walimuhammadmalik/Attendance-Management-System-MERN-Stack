@@ -4,13 +4,14 @@ const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.get("/profile", protect, userController.getUserProfile);
-router.put("/profile", protect, userController.updateUserProfile);
-router.post("/attendance", protect, userController.markAttendance);
-router.post("/leave", protect, userController.requestLeave);
-router.get("/attendance", protect, userController.getAttendanceReport);
-router.get("/leave", protect, userController.getLeaveRequest);
-router.delete("/profile", protect, userController.deleteUserProfile);
-router.get("/grade", protect, userController.getGrade);
+router.get("/profile", protect, userController.getUserProfile); //done
+router.put("/profile", protect, userController.updateUserProfile); //done
+router.post("/attendance", protect, userController.markAttendance); //done
+router.post("/leave", protect, userController.requestLeave); //done
+router.get("/attendance", protect, userController.getAttendanceReport); //done
+router.get("/leave", protect, userController.getLeaveRequest); //done
+router.delete("/profile", protect, userController.deleteUserProfile); //done
+router.get("/grade", protect, userController.getGrade); //done
+router.post("/grade", protect, userController.testGrade); //done
 
 module.exports = router;

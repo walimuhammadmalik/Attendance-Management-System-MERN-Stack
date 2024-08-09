@@ -13,5 +13,6 @@ router.get("/leave", protect, userController.getLeaveRequest); //done
 router.delete("/profile", protect, userController.deleteUserProfile); //done
 router.get("/grade", protect, userController.getGrade); //done
 router.post("/grade", protect, userController.testGrade); //done
+router.get("/users/:_id", userController.getUserById); //done
 
 module.exports = router;

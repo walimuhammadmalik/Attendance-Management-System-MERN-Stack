@@ -156,6 +156,22 @@ const testGrade = async (req, res) => {
   }
 };
 
+// get user by id
+const getUserById = async (req, res) => {
+  // console.log("get user by id: ");
+  // console.log("get user by id: ", req.params._id);
+  try {
+    const user = await User.findById(req.params._id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.log("get user by id error: ", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   getUserProfile,
   updateUserProfile,
@@ -166,4 +182,5 @@ module.exports = {
   deleteUserProfile,
   getGrade,
   testGrade,
+  getUserById,
 };

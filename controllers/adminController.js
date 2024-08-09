@@ -3,6 +3,59 @@ const User = require("../models/user");
 const Attendance = require("../models/attendance");
 const LeaveRequest = require("../models/leaveRequest");
 const Grade = require("../models/grade");
+const bcrypt = require("bcrypt");
+const { generateToken } = require("../middleware/authMiddleware");
+
+//adminRegister
+const adminRegister = async (req, res) => {
+  console.log("a Reg", req.body);
+  // console.log(req.body);
+  const { name, email, password } = req.body;
+  try {
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+    const user = new User({
+      name,
+      email,
+      password,
+      role: "admin",
+    });
+
+    await user.save();
+    const token = generateToken(user._id);
+    console.log("User registered", user);
+    res.status(201).json({ token, user });
+  } catch (error) {
+    console.log("Admin register err: ", error);
+    res.status(500).json({ message: "Server error hai" });
+  }
+};
+// adminLogin
+const adminLogin = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+    console.log("User login", user);
+    const token = generateToken(user._id);
+    res.json({ token, user });
+  } catch (error) {
+    console.log("Admin login err: ", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 // Get all students
 const manageStudents = async (req, res) => {
@@ -23,6 +76,7 @@ const getAttendanceRecords = async (req, res) => {
     );
     res.json(attendanceRecords);
   } catch (error) {
+    console.log("Get attendance records error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -36,6 +90,7 @@ const getLeaveRequests = async (req, res) => {
     );
     res.json(leaveRequests);
   } catch (error) {
+    console.log("Get leave requests error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -48,6 +103,7 @@ const manageGradingCriteria = async (req, res) => {
     const savedGrade = await newGrade.save();
     res.status(201).json(savedGrade);
   } catch (error) {
+    console.log("Manage grading criteria error: ", error);
     res.status(400).json({ message: "Bad request" });
   }
 };
@@ -107,15 +163,18 @@ const getAttendanceRecord = async (req, res) => {
     const attendance = await Attendance.find();
     res.json(attendance);
   } catch (error) {
+    console.log("Get attendance record error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 // get a student by email
 const getAttendanceRecordByEmail = async (req, res) => {
   try {
-    const attendance = await Attendance.findOne({ email: req.params.email });
+    const id = await User.findOne({ email: req.params.email });
+    const attendance = await Attendance.find({ userId: id._id });
     res.json(attendance);
   } catch (error) {
+    console.log("Get attendance record by email error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -123,9 +182,14 @@ const getAttendanceRecordByEmail = async (req, res) => {
 // post a student
 const postAttendanceRecord = async (req, res) => {
   try {
-    const attendance = await Attendance.create(req.body);
+    const obj = await User.findOne({ email: req.params.email });
+    const attendance = await Attendance.create({
+      userId: obj._id,
+      ...req.body,
+    });
     res.json(attendance);
   } catch (error) {
+    console.log("Post attendance record error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -133,8 +197,9 @@ const postAttendanceRecord = async (req, res) => {
 // update a student by email
 const updateAttendanceRecordByEmail = async (req, res) => {
   try {
+    const obj = await User.findOne({ email: req.params.email });
     const attendance = await Attendance.findOneAndUpdate(
-      { email: req.params.email },
+      { userId: obj._id, date: req.body.date },
       req.body,
       {
         new: true,
@@ -143,18 +208,22 @@ const updateAttendanceRecordByEmail = async (req, res) => {
     );
     res.json(attendance);
   } catch (error) {
+    console.log("Update attendance record by email error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// delete a student by email
+// delete a student by email, only selected date
 const deleteAttendanceRecordByEmail = async (req, res) => {
   try {
+    const obj = await User.findOne({ email: req.params.email });
     const attendance = await Attendance.findOneAndDelete({
-      email: req.params.email,
+      userId: obj._id,
+      date: req.body.date,
     });
     res.json(attendance);
   } catch (error) {
+    console.log("Delete attendance record by email error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -166,26 +235,26 @@ const getLeaveRequest = async (req, res) => {
     const leave = await LeaveRequest.find();
     res.json(leave);
   } catch (error) {
+    console.log("Get leave request error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
 //approve a leave request
-const approveLeaveRequest = async (req, res) => {
+const approveOrRejectLeaveRequest = async (req, res) => {
   try {
-    const leave = await LeaveRequest.findOne;
+    const obj = await User.findOne({ email: req.params.email });
+    const leave = await LeaveRequest.findOneAndUpdate(
+      { userId: obj._id },
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
     return res.json(leave);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
-// reject a leave request
-const rejectLeaveRequest = async (req, res) => {
-  try {
-    const leave = await LeaveRequest.findOne;
-    return res.json(leave);
-  } catch (error) {
+    console.log("Approve leave request error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -197,6 +266,7 @@ const getGradingCriteria = async (req, res) => {
     const grade = await Grade.find();
     res.json(grade);
   } catch (error) {
+    console.log("Get grading criteria error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -204,9 +274,11 @@ const getGradingCriteria = async (req, res) => {
 // get a grading criteria by grade student email
 const getGradingCriteriaByEmail = async (req, res) => {
   try {
-    const grade = await Grade.findOne({ email: req.params.email });
+    const obj = await User.findOne({ email: req.params.email });
+    const grade = await Grade.find({ userId: obj._id });
     res.json(grade);
   } catch (error) {
+    console.log("Get grading criteria by email error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -214,17 +286,20 @@ const getGradingCriteriaByEmail = async (req, res) => {
 // post a grading criteria
 const postGradingCriteria = async (req, res) => {
   try {
-    const grade = await Grade.create(req.body);
+    const obj = await User.findOne({ email: req.params.email });
+    const grade = await Grade.create({ userId: obj._id, ...req.body });
     res.json(grade);
   } catch (error) {
+    console.log("Post grading criteria error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 // update a grading criteria by grade student email
 const updateGradingCriteriaByEmail = async (req, res) => {
   try {
+    const obj = await User.findOne({ email: req.params.email });
     const grade = await Grade.findOneAndUpdate(
-      { email: req.params.email },
+      { userId: obj._id, attendancePercentage: req.body.attendancePercentage },
       req.body,
       {
         new: true,
@@ -233,19 +308,7 @@ const updateGradingCriteriaByEmail = async (req, res) => {
     );
     res.json(grade);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
-// mark a grading criteria using attendance by grade student email
-const markGradingCriteriaByEmail = async (req, res) => {
-  try {
-    const grade = await Grade.findOneAndUpdate(
-      { email: req.params.email },
-      req
-    );
-    res.json(grade);
-  } catch (error) {
+    console.log("Update grading criteria by email error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -253,14 +316,22 @@ const markGradingCriteriaByEmail = async (req, res) => {
 // delete a grading criteria by grade student email
 const deleteGradingCriteriaByEmail = async (req, res) => {
   try {
-    const grade = await Grade.findOneAndDelete({ email: req.params.email });
+    const obj = await User.findOne({ email: req.params.email });
+    const grade = await Grade.findOneAndDelete({
+      userId: obj._id,
+      attendancePercentage: req.body.attendancePercentage,
+      grade: req.body.grade,
+    });
     res.json(grade);
   } catch (error) {
+    console.log("Delete grading criteria by email error: ", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
 module.exports = {
+  adminRegister,
+  adminLogin,
   manageStudents,
   getAttendanceRecords,
   getLeaveRequests,
@@ -275,12 +346,10 @@ module.exports = {
   updateAttendanceRecordByEmail,
   deleteAttendanceRecordByEmail,
   getLeaveRequest,
-  approveLeaveRequest,
-  rejectLeaveRequest,
+  approveOrRejectLeaveRequest,
   getGradingCriteria,
   getGradingCriteriaByEmail,
   postGradingCriteria,
   updateGradingCriteriaByEmail,
-  markGradingCriteriaByEmail,
   deleteGradingCriteriaByEmail,
 };

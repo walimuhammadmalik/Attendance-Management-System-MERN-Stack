@@ -30,13 +30,6 @@ const generateToken = (id) => {
 module.exports = { protect, generateToken };
 
 
-
-//     } catch (error) {
-//       console.error(error);
-//       res.status(401).json({ message: "Not authorized, token failed" });
-//     }
-//   }
-
 //   if (!token) {
 //     res.status(401).json({ message: "Not authorized, no token" });
 //   }

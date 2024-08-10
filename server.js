@@ -50,15 +50,3 @@ app.listen(PORT, () => {
 
 // run this command in power shell
 // ngrok http http://localhost:5000
-
-// const User = require("./models/user");
-// async function testUser() {
-//   const user = await User.create({
-//     name: "John Doe",
-//     email: "wawas@g.com",
-//     password: "123asass",
-//     role: "admin",
-//   });
-//   console.log(user);
-// }
-// testUser();
